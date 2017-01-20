@@ -8,6 +8,8 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\Post;
+use app\models\PostSearch;
 
 class SiteController extends Controller
 {
@@ -113,6 +115,29 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionCategories()
+    {
+        $categories = \app\models\Category::find()->all();
+        return $this->render('categories', [
+            'categories' => $categories
+        ]);       
+    }
+
+    public function actionCategory()
+    {
+        $category_id = Yii::$app->getRequest()->getQueryParam('id');
+        $category = \app\models\Category::findOne($category_id);
+   
+        $searchModel = new PostSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['category_id'=>$category_id]);
+
+        return $this->render('category', [
+            'category' => $category,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider
+        ]);    
+    }
     /**
      * Displays about page.
      *
